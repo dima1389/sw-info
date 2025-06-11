@@ -8,40 +8,42 @@ set "ELF=firmware.elf"
 set "HEX=firmware.hex"
 set "S19=firmware.s19"
 set "LD=linker.ld"
+set "LOG=build.log"
 
-REM Delete previous build artifacts if they exist
+REM Start log file with timestamp
+echo [%date% %time%] Build started > %LOG%
+
+REM Delete previous artifacts
+echo Cleaning previous build files... | tee -a %LOG%
 del /q %OBJ% %ELF% %HEX% %S19% >nul 2>&1
 
-REM Compile the C source file to an object file
-echo Compiling %SRC%...
-arm-none-eabi-gcc -c %SRC% -mcpu=cortex-m4 -mthumb -o %OBJ%
+REM Compile source to object with extra warnings and optimizations
+echo Compiling %SRC%... | tee -a %LOG%
+arm-none-eabi-gcc -Wall -Wextra -Werror -Os -g -ffunction-sections -fdata-sections -mcpu=cortex-m4 -mthumb -c %SRC% -o %OBJ% >> %LOG% 2>&1
 if errorlevel 1 goto error
 
-REM Link the object file using the custom linker script
-echo Linking with linker script %LD%...
-arm-none-eabi-ld -T %LD% %OBJ% -o %ELF%
+REM Link object file using linker script
+echo Linking with %LD%... | tee -a %LOG%
+arm-none-eabi-ld -T %LD% %OBJ% -o %ELF% >> %LOG% 2>&1
 if errorlevel 1 goto error
 
-REM Generate HEX and S19 output formats
-echo Generating HEX and S19 files...
-arm-none-eabi-objcopy -O ihex %ELF% %HEX%
+REM Convert ELF to HEX and S19 formats
+echo Generating %HEX% and %S19%... | tee -a %LOG%
+arm-none-eabi-objcopy -O ihex %ELF% %HEX% >> %LOG% 2>&1
 if errorlevel 1 goto error
-arm-none-eabi-objcopy -O srec %ELF% %S19%
+arm-none-eabi-objcopy -O srec %ELF% %S19% >> %LOG% 2>&1
 if errorlevel 1 goto error
 
-REM Display information about the .sw_info section in the ELF file
-echo.
-echo Section headers containing '.sw_info':
-arm-none-eabi-objdump -h %ELF% | findstr .sw_info || echo .sw_info section not found
+REM Show .sw_info section address
+echo Looking for .sw_info section... | tee -a %LOG%
+arm-none-eabi-objdump -h %ELF% | findstr .sw_info >> %LOG% 2>&1
 
-REM Build completed successfully
-echo.
-echo Build completed successfully.
+REM Build success
+echo Build completed successfully. | tee -a %LOG%
 goto end
 
 :error
-echo.
-echo Build failed.
+echo Build failed. See %LOG% for details.
 exit /b 1
 
 :end
