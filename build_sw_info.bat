@@ -52,7 +52,7 @@ arm-none-eabi-objcopy -O ihex %ADV_DIR%\firmware.elf %ADV_DIR%\firmware.hex >> %
 arm-none-eabi-objcopy -O binary %ADV_DIR%\firmware.elf %ADV_DIR%\firmware.bin >> %LOG% 2>&1
 arm-none-eabi-objcopy -O srec %ADV_DIR%\firmware.elf %ADV_DIR%\firmware.s19 >> %LOG% 2>&1
 
-REM === Display .sw_info section addresses for both builds ===
+REM === Display .sw_info section addresses ===
 echo.
 echo Section info in BASIC build:
 arm-none-eabi-objdump -h %BASIC_DIR%\firmware.elf | findstr .sw_info
@@ -61,8 +61,30 @@ echo.
 echo Section info in ADVANCED build:
 arm-none-eabi-objdump -h %ADV_DIR%\firmware.elf | findstr .sw_info
 
+REM === Compare outputs ===
 echo.
-echo Build comparison completed. See %LOG% and inspect the files in %BASIC_DIR% and %ADV_DIR%.
+echo Comparing generated outputs...
+echo. >> %LOG%
+echo === File Comparisons === >> %LOG%
+
+set "FILES=sw_info.o firmware.elf firmware.hex firmware.s19 firmware.bin"
+
+for %%F in (%FILES%) do (
+    echo Comparing %%F...
+    echo [DIFF] Comparing %%F >> %LOG%
+
+    fc /b %BASIC_DIR%\%%F %ADV_DIR%\%%F >> %LOG% 2>&1
+    if errorlevel 1 (
+        echo Files differ: %%F
+        echo   -> See differences in %LOG%
+    ) else (
+        echo Files are identical: %%F
+    )
+)
+
+REM === Done ===
+echo.
+echo Build comparison completed. See %LOG% and inspect the outputs in %BASIC_DIR% and %ADV_DIR%.
 goto end
 
 :error
