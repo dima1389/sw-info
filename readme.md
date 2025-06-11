@@ -12,16 +12,29 @@ The main goal is to illustrate how embedded software version information can be:
 
 ## 🛠 Project Structure
 
-.
-├── build_basic/ # Output of the basic build
-├── build_advanced/ # Output of the advanced build
-├── build_compare.log # Log showing byte-by-byte differences between builds
-├── build_sw_info.bat # Batch script that builds both versions and compares outputs
-├── linker.ld # Linker script defining the .sw_info memory section
-├── sw_info.c # Source code with software metadata structure
-├── readme.md # This documentation file
-└── See # Possibly a note or helper file
+- **`build_basic/`**  
+  Output directory for the basic build.
 
+- **`build_advanced/`**  
+  Output directory for the advanced build.
+
+- **`build_compare.log`**  
+  Log file showing byte-by-byte differences between basic and advanced builds.
+
+- **`build_sw_info.bat`**  
+  Batch script that compiles both builds and performs the binary comparison.
+
+- **`linker.ld`**  
+  Linker script that defines the `.sw_info` memory section.
+
+- **`sw_info.c`**  
+  C source file containing the software version metadata structure.
+
+- **`readme.md`**  
+  This documentation file.
+
+- **`See`**  
+  A placeholder or helper file (purpose may vary).
 
 ## 📦 How It Works
 
