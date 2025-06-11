@@ -19,6 +19,7 @@ del /q %OBJ% %ELF% %HEX% %S19% >nul 2>&1
 
 REM Compile source to object with extra warnings and optimizations
 echo Compiling %SRC%... | tee -a %LOG%
+arm-none-eabi-gcc -c %SRC% -mcpu=cortex-m4 -mthumb -o %OBJ%
 arm-none-eabi-gcc -Wall -Wextra -Werror -Os -g -ffunction-sections -fdata-sections -mcpu=cortex-m4 -mthumb -c %SRC% -o %OBJ% >> %LOG% 2>&1
 if errorlevel 1 goto error
 
